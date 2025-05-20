@@ -1,0 +1,11 @@
+
+services:
+  backend:
+    build: .
+    ports: ["8000:8000"]
+  ui:
+    image: node:20
+    volumes: ["../ui:/ui"]
+    working_dir: /ui
+    command: ["npm","run","tauri"]
+    ports: ["3000:3000"]

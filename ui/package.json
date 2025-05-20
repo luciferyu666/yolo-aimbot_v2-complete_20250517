@@ -1,0 +1,7 @@
+
+{
+  "name":"aimbot-ui",
+  "version":"0.0.2",
+  "scripts":{"tauri":"tauri dev"},
+  "dependencies":{"react":"18.3.1","react-dom":"18.3.1","socket.io-client":"5.11.2"}
+}

@@ -1,0 +1,5 @@
+
+kmbox_mode: serial
+serial_port: /dev/ttyUSB0
+baud: 115200
+model_path: ai_engine/models/yolov8n.onnx

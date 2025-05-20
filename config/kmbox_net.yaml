@@ -1,0 +1,5 @@
+
+kmbox_mode: net
+host: 127.0.0.1
+port: 7000
+model_path: ai_engine/models/yolov8n.onnx

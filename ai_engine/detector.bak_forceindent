@@ -1,0 +1,41 @@
+
+import onnxruntime as ort, cv2, numpy as np, numpy as np, pathlib, urllib.request, ssl
+URL="https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx"
+def ensure(p):
+    if not p.exists():
+        p.parent.mkdir(parents=True,exist_ok=True)
+        ssl._create_default_https_context=ssl._create_unverified_context
+        urllib.request.urlretrieve(URL,p.as_posix())
+class Detector:
+    def __init__(self,model_path='ai_engine/models/yolov8n.onnx'):
+        p=pathlib.Path(model_path); ensure(p)
+        self.sess=ort.InferenceSession(p.as_posix(),providers=['CPUExecutionProvider'])
+        self.input=self.sess.get_inputs()[0].name
+    def predict(self, img, conf_thres: float = 0.25):
+    """Run ONNX-YOLOv8 inference and return [(x1,y1,x2,y2,conf), …]."""
+    ih, iw = img.shape[:2]                       # 原始影像尺寸
+    blob = cv2.dnn.blobFromImage(img, 1/255, (640, 640), swapRB=True)
+    out = self.sess.run(None, {self.input: blob})[0]   # (1,84,8400) or (8400,84)
+    out = out.squeeze()                         # -> (84,8400) or (8400,84)
+
+    # 若第一維只有 84 個元素就代表還沒轉置，先轉置成 (N,84)
+    if out.shape[0] == 84:
+        out = out.T
+
+    results = []
+    for det in out:
+        obj_conf = float(det[4])                # 物件置信度 (scalar)
+        cls_conf = float(det[5:].max())         # 最高類別分數
+        conf = obj_conf * cls_conf             # YOLOv8 常用的綜合置信度
+        if conf < conf_thres:
+            continue
+
+        cx, cy, w, h = det[:4]                  # 模型輸出座標以 640 為基準
+        scale_x, scale_y = iw / 640, ih / 640
+        x1 = int((cx - w / 2) * scale_x)
+        y1 = int((cy - h / 2) * scale_y)
+        x2 = int((cx + w / 2) * scale_x)
+        y2 = int((cy + h / 2) * scale_y)
+        results.append((x1, y1, x2, y2, conf))
+
+    return results

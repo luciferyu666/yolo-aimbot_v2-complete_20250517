@@ -1,0 +1,36 @@
+
+import onnxruntime as ort, cv2, numpy as np, numpy as np, pathlib, urllib.request, ssl
+URL="https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx"
+def ensure(p):
+    if not p.exists():
+        p.parent.mkdir(parents=True,exist_ok=True)
+        ssl._create_default_https_context=ssl._create_unverified_context
+        urllib.request.urlretrieve(URL,p.as_posix())
+class Detector:
+    def __init__(self,model_path='ai_engine/models/yolov8n.onnx'):
+        p=pathlib.Path(model_path); ensure(p)
+        self.sess=ort.InferenceSession(p.as_posix(),providers=['CPUExecutionProvider'])
+        self.input=self.sess.get_inputs()[0].name
+    def predict(self,img):
+        ih,iw=img.shape[:2]
+        blob=cv2.dnn.blobFromImage(img,1/255,(640,640),swapRB=True)
+        out=self.sess.run(None,{self.input:blob})[0]
+out = np.squeeze(out).T  # (8400, 84)
+res = []
+for det in out:
+    conf = float(det[4])
+    if conf < 0.25:
+        continue
+    cx, cy, w, h = det[:4]
+    x1 = int((cx - w / 2) * iw)
+    y1 = int((cy - h / 2) * ih)
+    x2 = int((cx + w / 2) * iw)
+    y2 = int((cy + h / 2) * ih)
+    res.append((x1, y1, x2, y2, conf))
+return res
+            if conf<0.25: continue
+            cx,cy,w,h=det[:4]
+            x1=int((cx-w/2)*iw);y1=int((cy-h/2)*ih)
+            x2=int((cx+w/2)*iw);y2=int((cy+h/2)*ih)
+            res.append((x1,y1,x2,y2,float(conf)))
+        return res

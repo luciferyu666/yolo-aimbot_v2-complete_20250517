@@ -1,0 +1,9 @@
+[project]
+name = "yolo-aimbot-v2"
+version = "0.0.1"
+description = "YOLO Aimbot v2 Complete"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = [""]
+include = ["ai_engine*", "control*", "api*", "cli*"]
