@@ -1,0 +1,5 @@
+name: valorant
+model: models/rtdetr.onnx
+device: kmbox_net
+fov: 80
+trigger_key: mouse_left

@@ -1,0 +1,5 @@
+name: apex
+model: models/yolonas.onnx
+device: kmbox_net
+fov: 90
+trigger_key: mouse_left
